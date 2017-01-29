@@ -12,6 +12,7 @@
     using Infrastructure.Mapping;
 
     // TODO: Abstract seed methods with one generic method
+    // TODO: Learn BulkInsert, BulkDelete, BulkUpdate Extension libraries for the Bets and the Odds
     public class DbSeeder : IDbSeeder
     {
         private readonly IXMLFeedsViewerData data;

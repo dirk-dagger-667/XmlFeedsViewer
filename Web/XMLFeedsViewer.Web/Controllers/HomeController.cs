@@ -37,8 +37,6 @@ namespace XMLFeedsViewer.Web.Controllers
                 started = true;
             }
 
-
-            // TODO: Get data from DB
             return View();
         }
     }

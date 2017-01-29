@@ -12,7 +12,7 @@
     {
         public ICollection<SportViewModel> GetAllSports()
         {
-            //TODO: Create the Initial Page
+            //TODO: Create the Initial page(Meaing visualize all the data on $(document).ready)
             return new List<SportViewModel>
             {
                 new SportViewModel
