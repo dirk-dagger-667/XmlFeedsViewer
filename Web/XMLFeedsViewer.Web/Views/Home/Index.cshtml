@@ -1,0 +1,72 @@
+﻿@{
+    ViewBag.Title = "Sport Bets";
+}
+<div id="sports">
+</div>
+
+@section scripts {
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            // Reference the auto-generated proxy for the hub.
+            var feeds = $.connection.Feeds;
+
+            // Start the connection.
+            $.connection.hub.start()
+                .then(init)
+                .done(function () {
+                    console.log('done');
+                });
+
+            function init() {
+                var eventIdCounter = 1;
+                return feeds.server.getAllSports().done(function (sports) {
+                    console.log('get all sports: ' + JSON.stringify(sports, null));
+                });
+            }
+
+            feeds.client.refreshData = function (data) {
+                console.log('refreshed data:' + JSON.stringify(data, null, 4));
+
+                var updatedSports = data["Sports"]["Updated"];
+                var deletedSports = data["Sports"]["Deleted"];
+                var addedSports = data["Sports"]["Added"];
+
+                var updatedEvents = data["Events"]["Updated"];
+
+                var updatedMatches = data['Matches']['Updated'];
+
+                $('div#sports').empty();
+
+                for (var i in updatedSports) {
+                    $('<div id=' + updatedSports[i].XmlId + '>' + updatedSports[i].Name + '</div>')
+                        .appendTo('div#sports');
+                }
+
+                for (var i in updatedEvents) {
+                    var selector = 'div#' + updatedEvents[i].ParentXmlId;
+                    $('<div id=' + updatedEvents[i].XmlId + ' style="margin-left: 15px">' + updatedEvents[i].Name + '</div>')
+                        .appendTo(selector);
+                }
+
+                for (var i in updatedMatches) {
+                    var selector = 'div#' + updatedMatches[i].ParentXmlId;
+                    $('<div id=' + updatedMatches[i].XmlId + ' style="margin-left: 50px">' + updatedMatches[i].Name + '</div>')
+                        .appendTo(selector);
+                }
+            }
+
+            // Crockford's supplant method (poor man's templating)
+            if (!String.prototype.supplant) {
+                String.prototype.supplant = function (o) {
+                    return this.replace(/{([^{}]*)}/g,
+                        function (a, b) {
+                            var r = o[b];
+                            return typeof r === 'string' || typeof r === 'number' ? r : a;
+                        }
+                    );
+                };
+            }
+        });
+    </script>
+}
