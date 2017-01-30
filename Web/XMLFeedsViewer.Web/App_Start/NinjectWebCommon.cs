@@ -98,7 +98,7 @@ namespace XMLFeedsViewer.Web.App_Start
             kernel.Bind<IDbSeeder>().To<DbSeeder>().InRequestOrBackgroundJobScope();
             kernel.Bind<IXmlParser>().To<XmlParser>()
                 .InRequestOrBackgroundJobScope()
-                .WithConstructorArgument("urlPath", @"T:\Programming\C# applications\XmlFeeds\xmlfeedviewer\Feed1.xml"); // TODO: Change to original URL
+                .WithConstructorArgument("urlPath", @"http://vitalbet.net/sportxml"); // TODO: Change to original URL
             kernel.Bind<FeedsHub>().ToSelf();
 
             kernel
