@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Sport Bets";
+}
+<div id="sports">
+</div>
+
+@section scripts {
+    <script src="~/signalr/hubs"></script>
+
+    <script>
+        $(function () {
+
+            // Reference the auto-generated proxy for the hub.
+            var feeds = $.connection.Feeds;
+
+             //Start the connection.
+            $.connection.hub.start()
+                .done(function () {
+                    console.log('done');
+                });
+
+            feeds.client.refreshData = function (data) {
+                console.log('refreshed data:' + JSON.stringify(data, null, 4));
+
+                var updatedSports = data["Sports"]["Updated"];
+                var addedSports = data["Sports"]["Added"];
+
+                var updatedEvents = data["Events"]["Updated"];
+                var addedEvents = data["Events"]["Added"];
+
+                var updatedMatches = data['Matches']['Updated'];
+                var addedMatches = data['Matches']['Added'];
+
+                $('div#sports').empty();
+
+                for (var sport in updatedSports) {
+                    $('<div id='
+                        + updatedSports[sport].XmlId
+                        + '>' + '- Sport : '
+                        + updatedSports[sport].Name + '</div>')
+                        .appendTo('div#sports');
+                }
+
+                for (var sport in addedSports) {
+                    $('<div id='
+                        + addedSports[sport].XmlId
+                        + '>'
+                        + '- Sport : '
+                        + addedSports[sport].Name
+                        + '<div')
+                        .appendTo('div#sports')
+                }
+
+                for (var event in updatedEvents) {
+                    var selector = 'div#' + updatedEvents[event].ParentXmlId;
+                    $('<div id='
+                        + updatedEvents[event].XmlId
+                        + ' style="margin-left: 25px">'
+                        + '-- Event : '
+                        + updatedEvents[event].Name
+                        + ' [ ' + updatedEvents[event].IsLive + ' ]'
+                        + '</div>')
+                        .appendTo(selector);
+                }
+
+                for (var event in addedEvents) {
+                    var selector = 'div#' + addedEvents[event].ParentXmlId;
+                    $('<div id='
+                        + addedEvents[event].XmlId
+                        + ' style="margin-left: 25px">'
+                        + '-- Event : '
+                        + addedEvents[event].Name
+                        + ' [ ' + addedEvents[event].IsLive + ' ]');
+                }
+
+                for (var match in updatedMatches) {
+                    var selector = 'div#' + updatedMatches[match].ParentXmlId;
+                    $('<div id=' + updatedMatches[match].XmlId
+                        + ' style="margin-left: 50px">'
+                        + '** Match : '
+                        + updatedMatches[match].Name
+                        + ' [ ' + updatedMatches[match].MatchType + ' Start Time: '
+                        + updatedMatches[match].StartTime + ']'
+                        + '</div>')
+                        .appendTo(selector);
+                }
+
+                for (var match in addedMatches) {
+                    var selector = 'div#' + addedMatches[match].ParentXmlId;
+                    $('<div id=' + addedMatches[match].XmlId
+                        + ' style="margin-left: 50px">'
+                        + '** Match : '
+                        + addedMatches[match].Name
+                        + ' [ ' + addedMatches[match].MatchType + ' Start Time: '
+                        + addedMatches[match].StartTime + ' ]'
+                        + '</div>')
+                        .appendTo(selector);
+                }
+
+            }
+
+            // Crockford's supplant method (poor man's templating)
+            if (!String.prototype.supplant) {
+                String.prototype.supplant = function (o) {
+                    return this.replace(/{([^{}]*)}/g,
+                        function (a, b) {
+                            var r = o[b];
+                            return typeof r === 'string' || typeof r === 'number' ? r : a;
+                        }
+                    );
+                };
+            }
+        });
+    </script>
+}
