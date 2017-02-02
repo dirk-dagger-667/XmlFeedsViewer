@@ -66,7 +66,7 @@
         {
             var result = new DataOperationsResult<SportDTO>();
 
-            var oldSports = this.data.Sports.SearchFor(os => os.IsDeleted == false).ToList();
+            var oldSports = this.data.Sports.GetAll()/*SearchFor(os => os.IsDeleted == false)*/.ToList();
 
             if (oldSports.Count == 0)
             {
@@ -78,7 +78,7 @@
                 var oldSportsAsDTO = Mapper.Map<IEnumerable<SportDTO>>(oldSports);
                 var sportsForUpdate = oldSportsAsDTO.Intersect(sports, this.sportComparer);
                 var sportsForDeletion = oldSportsAsDTO.Except(sportsForUpdate, this.sportComparer);
-                var sportsForAdding = sports.Except(sportsForUpdate, this.sportComparer);
+                var sportsForAdding = sports.Except(/*sportsForUpdate*/oldSportsAsDTO, this.sportComparer);
 
                 if (sportsForDeletion.Any())
                 {
@@ -115,7 +115,7 @@
 
             foreach (var sport in sports)
             {
-                var oldEvents = this.data.Events.SearchFor(e => e.ParentXmlId == sport.XmlId && e.IsDeleted == false).ToList();
+                var oldEvents = this.data.Events.SearchFor(e => e.ParentXmlId == sport.XmlId /*&& e.IsDeleted == false*/).ToList();
                 var newEvents = events.Where(e => e.ParentXmlId == sport.XmlId);
 
                 if (oldEvents.Count == 0)
@@ -130,7 +130,7 @@
                     var oldEventsAsDTO = Mapper.Map<IEnumerable<EventDTO>>(oldEvents);
                     var eventsForUpdate = oldEventsAsDTO.Intersect(newEvents, this.eventComparer);
                     var eventsForDeletion = oldEventsAsDTO.Except(eventsForUpdate, this.eventComparer);
-                    var eventsForAdding = newEvents.Except(eventsForUpdate, this.eventComparer);
+                    var eventsForAdding = newEvents.Except(oldEventsAsDTO, this.eventComparer);
 
                     if (eventsForDeletion.Any())
                     {
@@ -175,7 +175,7 @@
 
             foreach (var eventDb in events)
             {
-                var oldMatches = this.data.Matches.SearchFor(m => m.ParentXmlId == eventDb.XmlId && m.IsDeleted == false).ToList();
+                var oldMatches = this.data.Matches.SearchFor(m => m.ParentXmlId == eventDb.XmlId /*&& m.IsDeleted == false*/).ToList();
                 var newMatches = matches.Where(e => e.ParentXmlId == eventDb.XmlId);
 
                 if (oldMatches.Count == 0 && newMatches.Any())
@@ -189,7 +189,7 @@
                     var oldMatchesAsDTO = Mapper.Map<IEnumerable<MatchDTO>>(oldMatches);
                     var matchesForUpdate = oldMatchesAsDTO.Intersect(newMatches, this.matchComparer);
                     var matchesForDeletion = oldMatchesAsDTO.Except(matchesForUpdate, this.matchComparer);
-                    var matchesForAdding = newMatches.Except(matchesForUpdate, this.matchComparer);
+                    var matchesForAdding = newMatches.Except(oldMatchesAsDTO, this.matchComparer);
 
                     if (matchesForDeletion.Any())
                     {
