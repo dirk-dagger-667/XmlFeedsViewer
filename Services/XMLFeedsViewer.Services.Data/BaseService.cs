@@ -55,8 +55,8 @@ namespace XMLFeedsViewer.Services.Data
 
             foreach (var entity in result)
             {
-                //entity.IsDeleted = true;
-                repository.Delete(entity);
+                entity.IsDeleted = true;
+                repository.Update(entity);
             }
         }
 
